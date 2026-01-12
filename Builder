@@ -1,39 +1,51 @@
-class House:
-    def __init__(self):
-        self.walls = None
-        self.roof = None
-        self.windows = None
+#include <iostream>
+#include <memory>
+#include <string>
 
-    def __str__(self):
-        return f"Дом: стены={self.walls}, крыша={self.roof}, окна={self.windows}"
+class Pizza {
+    std::string dough;
+    std::string sauce;
+    std::string topping;
 
+public:
+    Pizza& setDough(std::string d) { dough = std::move(d); return *this; }
+    Pizza& setSauce(std::string s) { sauce = std::move(s); return *this; }
+    Pizza& setTopping(std::string t) { topping = std::move(t); return *this; }
 
-class HouseBuilder:
-    def __init__(self):
-        self.house = House()
+    void show() const {
+        std::cout << "Pizza with " << dough << " dough, "
+                  << sauce << " sauce, and "
+                  << topping << " topping.\n";
+    }
+};
 
-    def build_walls(self, walls):
-        self.house.walls = walls
-        return self
+class PizzaBuilder {
+    std::shared_ptr<Pizza> pizza;
+public:
+    PizzaBuilder() : pizza(std::make_shared<Pizza>()) {}
 
-    def build_roof(self, roof):
-        self.house.roof = roof
-        return self
+    PizzaBuilder& buildDough(std::string d) {
+        pizza->setDough(std::move(d));
+        return *this;
+    }
+    PizzaBuilder& buildSauce(std::string s) {
+        pizza->setSauce(std::move(s));
+        return *this;
+    }
+    PizzaBuilder& buildTopping(std::string t) {
+        pizza->setTopping(std::move(t));
+        return *this;
+    }
 
-    def build_windows(self, windows):
-        self.house.windows = windows
-        return self
+    std::shared_ptr<Pizza> getResult() const { return pizza; }
+};
 
-    def build(self):
-        return self.house
+int main() {
+    auto pizza = PizzaBuilder()
+        .buildDough("thin")
+        .buildSauce("tomato")
+        .buildTopping("cheese + pepperoni")
+        .getResult();
 
-builder = HouseBuilder()
-house = (
-    builder
-    .build_walls("кирпичные")
-    .build_roof("черепичная")
-    .build_windows("панорамные")
-    .build()
-)
-
-print(house)
+    pizza->show();
+}
